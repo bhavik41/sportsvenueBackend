@@ -1,0 +1,125 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid()) @map("_id")
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(user)
+  grounds   Ground[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user")
+}
+
+model Ground {
+  id          String     @id @default(cuid()) @map("_id")
+  name        String
+  description String
+  location    Json
+  groundType  GroundType
+  amenities   String[]
+  basePrice   Float
+  isActive    Boolean    @default(true)
+  images      String[]
+  adminId     String
+  admin       User       @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  slots       TimeSlot[]
+  offers      Offer[]
+  bookings    Booking[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("grounds")
+}
+
+model TimeSlot {
+  id          String    @id @default(cuid()) @map("_id")
+  startTime   String
+  endTime     String
+  days        String[]
+  price       Float
+  isAvailable Boolean   @default(true)
+  groundId    String
+  ground      Ground    @relation(fields: [groundId], references: [id], onDelete: Cascade)
+  bookings    Booking[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("time_slots")
+}
+
+model Offer {
+  id              String       @id @default(cuid()) @map("_id")
+  title           String
+  description     String
+  discountType    DiscountType
+  discountValue   Float
+  validFrom       DateTime
+  validTo         DateTime
+  isActive        Boolean      @default(true)
+  applicableSlots String[]
+  groundId        String
+  ground          Ground       @relation(fields: [groundId], references: [id], onDelete: Cascade)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@map("offers")
+}
+
+model Booking {
+  id          String        @id @default(cuid()) @map("_id")
+  date        DateTime
+  status      BookingStatus @default(pending)
+  totalAmount Float
+  userId      String
+  groundId    String
+  timeSlotId  String
+  ground      Ground        @relation(fields: [groundId], references: [id])
+  timeSlot    TimeSlot      @relation(fields: [timeSlotId], references: [id])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("bookings")
+}
+
+enum Role {
+  admin
+  user
+}
+
+enum GroundType {
+  box_cricket
+  pickle_ball
+  football
+  badminton
+  tennis
+  basketball
+  other
+}
+
+enum DiscountType {
+  percentage
+  fixed
+}
+
+enum BookingStatus {
+  pending
+  confirmed
+  cancelled
+  completed
+}
