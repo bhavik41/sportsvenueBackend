@@ -8,9 +8,7 @@ router.post("/signup", UserControllers.signUp);
 router.post("/signin", UserControllers.signIn);
 
 // Example protected route accessible only to authenticated users
-router.get("/profile", authenticate, (req, res) => {
-  res.status(200).json({ message: "This is a protected profile route" });
-});
+router.get("/profile", authenticate, UserControllers.getUserProfile);
 
 // Example admin-only route
 router.get("/admin", authenticate, authorizeRoles("admin"), (req, res) => {

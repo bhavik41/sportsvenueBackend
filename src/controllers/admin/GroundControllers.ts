@@ -239,6 +239,54 @@ export const getAllGrounds = async (
     res.status(500).json({ error: "Server error" });
   }
 };
+export const getAllGroundsByAdminId = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<any> => {
+  try {
+    const { search, type, city } = req.query;
+    const userId = req.user.userId;
+
+    // Ensure query params are strings
+    const searchStr = Array.isArray(search)
+      ? search[0]
+      : (search as string | undefined);
+    const cityStr = Array.isArray(city)
+      ? city[0]
+      : (city as string | undefined);
+
+    const where: any = {
+      adminId: userId,
+      ...(searchStr && {
+        OR: [
+          { name: { contains: searchStr, mode: "insensitive" } },
+          { location: { contains: searchStr, mode: "insensitive" } },
+        ],
+      }),
+      ...(typeof type === "string" && { groundType: type.toUpperCase() }),
+      ...(cityStr && { location: { contains: cityStr, mode: "insensitive" } }),
+    };
+
+    const grounds = await prisma.ground.findMany({
+      where,
+      include: {
+        slots: true,
+        offers: true,
+        _count: {
+          select: {
+            bookings: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    res.json(grounds);
+  } catch (error) {
+    console.error("Fetch grounds error:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
 
 export const getGroundById = async (
   req: AuthenticatedRequest,
