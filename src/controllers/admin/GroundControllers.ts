@@ -340,3 +340,18 @@ export const getGroundById = async (
     res.status(500).json({ error: "Server error" });
   }
 };
+
+export const deleteGround = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  try {
+    const ground = await prisma.ground.delete({
+      where: { id: req.params.id },
+    });
+    res.json(ground);
+  } catch (error) {
+    console.error("Delete ground error:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};

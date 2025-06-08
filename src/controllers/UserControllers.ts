@@ -82,7 +82,7 @@ export const getUserProfile = async (
     }
     const { password: _, ...userWithoutPassword } = user;
 
-    return res.status(200).json(userWithoutPassword);
+    return res.status(200).json({ user: userWithoutPassword });
   } catch (error) {
     console.error("Error fetching user profile:", error);
     return res.status(500).json({ error: "Failed to fetch user profile" });

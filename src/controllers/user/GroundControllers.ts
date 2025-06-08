@@ -86,6 +86,8 @@ export const getAllGrounds = async (
         basePrice: true,
         images: true,
         location: true,
+        amenities: true,
+        isActive: true,
       },
     });
 
