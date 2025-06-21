@@ -4,6 +4,7 @@ import express from "express";
 import multer from "multer";
 import {
   createGround,
+  deleteGround,
   getAllGrounds,
   getAllGroundsByAdminId,
   updateGround,
@@ -18,5 +19,7 @@ router.put("/:id", upload.array("images"), updateGround);
 
 router.get("/", authenticate, getAllGrounds);
 router.get("/:id", authenticate, getAllGroundsByAdminId);
+
+router.delete("/:id", authenticate, deleteGround);
 
 export default router;

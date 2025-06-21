@@ -88,6 +88,7 @@ export const getAllGrounds = async (
         location: true,
         amenities: true,
         isActive: true,
+        offers: true,
       },
     });
 
@@ -118,6 +119,7 @@ export const getGroundById = async (
         },
       },
     });
+
     res.status(200).json(ground);
   } catch (error) {
     console.error("Fetch ground error:", error);

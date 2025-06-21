@@ -77,6 +77,7 @@ model Offer {
   ground          Ground       @relation(fields: [groundId], references: [id], onDelete: Cascade)
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
+  couponCode      String       @default(cuid())
 
   @@map("offers")
 }
