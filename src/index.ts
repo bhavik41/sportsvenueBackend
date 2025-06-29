@@ -25,9 +25,12 @@ cloudinary.v2.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+import bookingRoutes from "./routes/booking.routes";
+
 app.use("/auth", UserRoutes);
 app.use("/admin/grounds", adminGroundRoutes);
 app.use("/user/grounds", userGroundRoutes);
+app.use("/bookings", bookingRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);

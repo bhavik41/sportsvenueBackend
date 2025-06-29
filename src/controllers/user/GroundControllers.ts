@@ -7,30 +7,6 @@ interface AuthenticatedRequest extends Request {
   user?: any;
 }
 
-// export const getAllGrounds = async (
-//   req: AuthenticatedRequest,
-//   res: Response
-// ): Promise<any> => {
-//   try {
-//     const skip = Math.max(0, Number(req.query.skip) || 0);
-//     const limit = Math.max(1, Number(req.query.limit) || 10);
-//     const totalGrounds = await prisma.ground.count();
-//     const grounds = await prisma.ground.findMany({
-//       select: {
-//         id: true,
-//         name: true,
-//         description: true,
-//         groundType: true,
-//         basePrice: true,
-//         images: true,
-//       },
-//       skip,
-//       take: limit,
-//     });
-
-//     res.status(200).json({ grounds, totalGrounds });
-//   } catch {}
-// };
 export const getAllGrounds = async (
   req: AuthenticatedRequest,
   res: Response
@@ -112,6 +88,17 @@ export const getGroundById = async (
       include: {
         slots: true,
         offers: true,
+        bookings: {
+          where: {
+            status: { notIn: ["cancelled"] },
+          },
+          select: {
+            id: true,
+            timeSlotId: true,
+            date: true,
+            status: true,
+          },
+        },
         _count: {
           select: {
             bookings: true,
@@ -124,5 +111,45 @@ export const getGroundById = async (
   } catch (error) {
     console.error("Fetch ground error:", error);
     res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const getBookings = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<any> => {
+  try {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    console.log(userId);
+
+    const bookings = await prisma.booking.findMany({
+      where: { userId: userId },
+      include: {
+        ground: {
+          select: {
+            name: true,
+            location: true,
+            groundType: true,
+          },
+        },
+        timeSlot: {
+          select: {
+            startTime: true,
+            endTime: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+    console.log(bookings);
+
+    res.json(bookings);
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    res.status(500).json({ message: "Error fetching bookings" });
   }
 };

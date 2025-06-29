@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authenticate, authorizeRoles } from "../../middleware/auth";
-import * as GroundRoutes from "../../controllers/user/GroundControllers";
+import * as GroundControllers from "../../controllers/user/GroundControllers";
 
 const router = Router();
 
@@ -8,14 +8,21 @@ router.get(
   "/",
   authenticate,
   authorizeRoles("user"),
-  GroundRoutes.getAllGrounds
+  GroundControllers.getAllGrounds
 );
 
 router.get(
   "/:id",
   authenticate,
   authorizeRoles("user"),
-  GroundRoutes.getGroundById
+  GroundControllers.getGroundById
+);
+
+router.get(
+  "/booking",
+  authenticate,
+  authorizeRoles("user"),
+  GroundControllers.getBookings
 );
 
 export default router;

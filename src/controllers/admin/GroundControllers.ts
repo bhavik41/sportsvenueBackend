@@ -68,149 +68,6 @@ export const createGround = async (req: Request, res: Response) => {
   }
 };
 
-// export const updateGround = async (req: Request, res: Response) => {
-//   //   try {
-//   const groundData = JSON.parse(req.body.groundData);
-//   const images = req.files as Express.Multer.File[];
-
-//   // Upload images to Cloudinary
-//   const imageUrls = await uploadImages(images);
-
-//   const ground = await prisma.ground.update({
-//     where: { id: req.params.id },
-//     data: {
-//       name: groundData.name,
-//       description: groundData.description,
-//       location: groundData.location,
-//       groundType: groundData.groundType,
-//       amenities: groundData.amenities,
-//       basePrice: groundData.basePrice,
-//       isActive: groundData.isActive,
-//       images: imageUrls,
-//       slots: {
-//         create: groundData.slots.map((slot: any) => ({
-//           startTime: slot.startTime,
-//           endTime: slot.endTime,
-//           price: slot.price,
-//           isAvailable: slot.isAvailable,
-//           days: slot.days,
-//         })),
-//       },
-//       offers: {
-//         update: groundData.offers.map((offer: any) => ({
-//           where: { id: offer.id }, // Specify which offer to update
-//           data: {
-//             title: offer.title,
-//             description: offer.description,
-//             discountType: offer.discountType,
-//             discountValue: offer.discountValue,
-//             validFrom: new Date(offer.validFrom),
-//             validTo: new Date(offer.validTo),
-//             isActive: offer.isActive,
-//             applicableSlots: offer.applicableSlots,
-//           },
-//         })),
-//       },
-//       admin: {
-//         connect: { id: groundData.adminId }, // Connect to the existing admin
-//       },
-//     },
-//     include: {
-//       slots: true,
-//       offers: true,
-//       admin: true, // Include the admin in the response if needed
-//     },
-//   });
-
-//   res.json(ground);
-//   //   } catch (error) {
-//   //     res.status(400).json({
-//   //       error: error instanceof Error ? error.message : "Unknown error",
-//   //     });
-//   //   }
-// };
-
-// export const updateGround = async (req: Request, res: Response) => {
-//   // try {
-//   const groundData = JSON.parse(req.body.groundData);
-//   console.log(groundData);
-//   const images = req.files as Express.Multer.File[];
-
-//   // Upload images to Cloudinary
-//   const imageUrls = await uploadImages(images);
-//   const allImages = [...(groundData.images || []), ...imageUrls];
-
-//   const ground = await prisma.ground.update({
-//     where: { id: req.params.id },
-//     data: {
-//       name: groundData.name,
-//       description: groundData.description,
-//       location: groundData.location,
-//       groundType: groundData.groundType,
-//       amenities: groundData.amenities,
-//       basePrice: groundData.basePrice,
-//       isActive: groundData.isActive,
-//       images: allImages,
-//       slots: {
-//         // Delete existing slots
-//         update: groundData.slots
-//           .filter((slot: any) => slot.id)
-//           .map((slot: any) => ({
-//             where: { id: slot.id },
-//             data: {
-//               startTime: slot.startTime,
-//               endTime: slot.endTime,
-//               price: slot.price,
-//               isAvailable: slot.isAvailable,
-//               days: slot.days,
-//             },
-//           })),
-//         // 2. Create new slots
-//         create: groundData.slots
-//           .filter((slot: any) => !slot.id)
-//           .map((slot: any) => ({
-//             startTime: slot.startTime,
-//             endTime: slot.endTime,
-//             price: slot.price,
-//             isAvailable: slot.isAvailable,
-//             days: slot.days,
-//           })),
-//       },
-//       offers: {
-//         // Delete existing offers
-//         update: groundData.offers.map((offer: any) => ({
-//           where: { id: offer.id },
-//           data: {
-//             title: offer.title,
-//             description: offer.description,
-//             discountType: offer.discountType,
-//             discountValue: offer.discountValue,
-//             validFrom: new Date(offer.validFrom),
-//             validTo: new Date(offer.validTo),
-//             isActive: offer.isActive,
-//             applicableSlots: offer.applicableSlots,
-//           },
-//         })),
-//       },
-//       admin: {
-//         connect: { id: groundData.adminId },
-//       },
-//     },
-//     include: {
-//       slots: true,
-//       offers: true,
-//       admin: true,
-//     },
-//   });
-
-//   res.json(ground);
-//   // } catch (error) {
-//   //   res.status(400).json({
-//   //     error: error instanceof Error ? error.message : "Unknown error",
-//   //   });
-//   // }
-// };
-
 export const updateGround = async (req: Request, res: Response) => {
   try {
     const groundData = JSON.parse(req.body.groundData);
@@ -379,6 +236,7 @@ export const getAllGrounds = async (
     res.status(500).json({ error: "Server error" });
   }
 };
+
 export const getAllGroundsByAdminId = async (
   req: AuthenticatedRequest,
   res: Response
@@ -426,70 +284,77 @@ export const getAllGroundsByAdminId = async (
   // }
 };
 
-export const getGroundById = async (
-  req: AuthenticatedRequest,
-  res: Response
-) => {
-  try {
-    const ground = await prisma.ground.findUnique({
-      where: { id: req.params.id },
-      include: {
-        slots: true,
-        offers: true,
-        _count: {
-          select: {
-            bookings: true,
-          },
-        },
-      },
-    });
-    res.json(ground);
-  } catch (error) {
-    console.error("Fetch ground error:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-  if (!req.user) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
+// export const getGroundById = async (
+//   req: AuthenticatedRequest,
+//   res: Response
+// ) => {
+//   try {
+//     const ground = await prisma.ground.findUnique({
+//       where: { id: req.params.id },
+//       include: {
+//         slots: true,
+//         offers: true,
+//         _count: {
+//           select: {
+//             bookings: true,
+//           },
+//         },
+//       },
+//     });
+//     res.json(ground);
+//   } catch (error) {
+//     console.error("Fetch ground error:", error);
+//     res.status(500).json({ error: "Server error" });
+//   }
+//   if (!req.user) {
+//     return res.status(401).json({ error: "Unauthorized" });
+//   }
 
-  if (req.params.id == null) {
-    return res.status(400).json({ error: "Invalid ground ID" });
-  }
+//   if (req.params.id == null) {
+//     return res.status(400).json({ error: "Invalid ground ID" });
+//   }
 
-  try {
-    const ground = await prisma.ground.findFirst({
-      where: {
-        id: req.params.id,
-        adminId: req.user.id,
-      },
-      include: {
-        slots: true,
-        offers: true,
-      },
-    });
+//   try {
+//     const ground = await prisma.ground.findFirst({
+//       where: {
+//         id: req.params.id,
+//         adminId: req.user.id,
+//       },
+//       include: {
+//         slots: true,
+//         offers: true,
+//       },
+//     });
 
-    if (!ground) {
-      return res.status(404).json({ error: "Ground not found" });
-    }
+//     if (!ground) {
+//       return res.status(404).json({ error: "Ground not found" });
+//     }
 
-    res.json(ground);
-  } catch (error) {
-    console.error("Fetch ground error:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-};
+//     res.json(ground);
+//   } catch (error) {
+//     console.error("Fetch ground error:", error);
+//     res.status(500).json({ error: "Server error" });
+//   }
+// };
 
 export const deleteGround = async (
   req: AuthenticatedRequest,
   res: Response
 ) => {
-  // try {
-  const ground = await prisma.ground.delete({
-    where: { id: req.params.id },
-  });
-  res.status(200).json(ground);
-  // } catch (error) {
-  //   console.error("Delete ground error:", error);
-  //   res.status(500).json({ error: "Server error" });
-  // }
+  try {
+    const ground = await prisma.ground.delete({
+      where: { id: req.params.id },
+    });
+
+    const slots = await prisma.timeSlot.deleteMany({
+      where: {
+        groundId: req.params.id,
+      },
+    });
+
+    res.status(200).json(ground);
+  } catch (error) {
+    console.error("Delete ground error:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 };
